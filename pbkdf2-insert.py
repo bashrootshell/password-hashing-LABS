@@ -60,7 +60,7 @@ else:
 
         try:
             print('Conectando no banco de dados...')
-            conn = sqlite3.connect("dbusers.sqllite.db")
+            conn = sqlite3.connect("dbusers.pbkdf2.sqlite3")
             cc = conn.cursor()
             unixtime = int(time())
             cc.execute("INSERT INTO users VALUES (?, ?, ?, ?)",

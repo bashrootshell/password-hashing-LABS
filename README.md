@@ -1,3 +1,4 @@
 # password-hashing-LABS
  
-PBKDF2 / SCRYPT Python Implementations for educational purposes.
+Very simple PBKDF2 / SCRYPT Python Implementation for educational purposes only.
+Not suitable for production.

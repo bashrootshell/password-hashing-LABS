@@ -12,6 +12,10 @@ import sqlite3
 """
 
 
+db = "dbusers.scrypt.sqlite3"
+select_username = "SELECT * FROM users where username =?"
+insert_username = "INSERT INTO users VALUES (?, ?, ?)"
+
 print(f'--- Criação das credencias de novo usuário ---')
 print(f'Digite um nome de usuario:')
 username = input()
@@ -19,9 +23,9 @@ if len(username) == 0:
     print(f'Digite um nome de usuário.')
     exit()
 else:
-    conn = sqlite3.connect("dbusers.scrypt.sqlite3")
+    conn = sqlite3.connect(db)
     cc = conn.cursor()
-    cc.execute("SELECT * FROM users where username =?", (username,))
+    cc.execute(select_username, (username,))
     data = cc.fetchone()
     if data is not None:
         print(f'Usuário já cadastrado.')
@@ -52,11 +56,10 @@ else:
 
         try:
             print('Conectando no banco de dados...')
-            conn = sqlite3.connect("dbusers.scrypt.sqlite3")
+            conn = sqlite3.connect(db)
             cc = conn.cursor()
             unixtime = int(time())
-            cc.execute("INSERT INTO users VALUES (?, ?, ?)",
-                       (username, hashedpwd, unixtime))
+            cc.execute(insert_username, (username, hashedpwd, unixtime))
             conn.commit()
             print(f'Usuário "{username}" cadastrado com sucesso.')
             conn.close()

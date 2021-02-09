@@ -10,6 +10,9 @@ import sqlite3
     — The Zen of Python
 """
 
+db = "dbusers.scrypt.sqlite3"
+select_username = "SELECT * FROM users where username =?"
+
 try:
 
     print(f'Autenticação de usuário.')
@@ -19,9 +22,9 @@ try:
         print(f'Erro: Digite um nome de usuário.')
         exit()
     else:
-        conn = sqlite3.connect("dbusers.scrypt.sqlite3")
+        conn = sqlite3.connect(db)
         cc = conn.cursor()
-        cc.execute("SELECT * FROM users where username =?", (user,))
+        cc.execute(select_username, (user,))
         data = cc.fetchall()
         if data != []:
             for row in data:

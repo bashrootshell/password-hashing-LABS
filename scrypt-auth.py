@@ -25,9 +25,9 @@ try:
         conn = sqlite3.connect(db)
         cc = conn.cursor()
         cc.execute(select_username, (user,))
-        data = cc.fetchall()
-        if data != []:
-            for row in data:
+        data = cc.fetchone()
+        if data is not None:
+            for _ in data:
                 print(f'Digite a senha para o usuário {user}:')
                 password = input()
                 if len(password) == 0:
@@ -35,7 +35,7 @@ try:
                     conn.close()
                     exit()
                 else:
-                    hashed_db_password = row[1]
+                    hashed_db_password = data[1]
                     checkpwd = scrypt.verify(password, hashed_db_password)
                     if checkpwd:
                         print(f'Usuário "{user}" está autenticado.')

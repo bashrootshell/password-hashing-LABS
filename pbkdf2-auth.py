@@ -26,9 +26,9 @@ try:
         conn = sqlite3.connect(db)
         cc = conn.cursor()
         cc.execute(select_username, (user,))
-        data = cc.fetchall()
-        if data != []:
-            for row in data:
+        data = cc.fetchone()
+        if data is not None:
+            for _ in data:
                 print(f'Digite a senha para o usuário {user}:')
                 password = input()
                 if len(password) == 0:
@@ -36,8 +36,8 @@ try:
                     conn.close()
                     exit()
                 else:
-                    salt = row[1]
-                    hashed_db_password = row[2]
+                    salt = data[1]
+                    hashed_db_password = data[2]
                     checkpwd = pbkdf2_hmac('sha3_512', salt,
                                            password.encode('utf-8'), 25000)
                     if checkpwd == hashed_db_password:

@@ -1,6 +1,6 @@
 # password-hashing-LABS
 
-A simple password hashing PBKDF2 / SCRYPT Python Implementation for educational purposes only.
+### A simple password hashing PBKDF2 / SCRYPT Python Implementation for educational purposes only.
 
 
 It also executes a basic password strength test (not fancy at all, a pretty basic one).

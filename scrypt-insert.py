@@ -13,6 +13,8 @@ import sqlite3
 
 
 db = "dbusers.scrypt.sqlite3"
+conn = sqlite3.connect(db)
+cc = conn.cursor()
 select_username = "SELECT * FROM users where username =?"
 insert_username = "INSERT INTO users VALUES (?, ?, ?)"
 
@@ -23,8 +25,6 @@ if len(username) == 0:
     print(f'Digite um nome de usuário.')
     exit()
 else:
-    conn = sqlite3.connect(db)
-    cc = conn.cursor()
     cc.execute(select_username, (username,))
     data = cc.fetchone()
     if data is not None:
@@ -56,8 +56,6 @@ else:
 
         try:
             print('Conectando no banco de dados...')
-            conn = sqlite3.connect(db)
-            cc = conn.cursor()
             unixtime = int(time())
             cc.execute(insert_username, (username, hashedpwd, unixtime))
             conn.commit()

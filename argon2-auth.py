@@ -24,9 +24,9 @@ try:
         conn = sqlite3.connect(db)
         cc = conn.cursor()
         cc.execute(select_username, (user,))
-        retorno_consulta = cc.fetchone()
-        if retorno_consulta is not None:
-            for _ in retorno_consulta:
+        check_users = cc.fetchone()
+        if check_users is not None:
+            for _ in check_users:
                 print(f'Digite a senha para o usuário {user}:')
                 password = input()
                 if len(password) == 0:
@@ -34,7 +34,7 @@ try:
                     conn.close()
                     callexit()
                 else:
-                    hashed_db_password = retorno_consulta[1]
+                    hashed_db_password = check_users[1]
                     checkpwd = argon2.verify(password, hashed_db_password)
                     if checkpwd:
                         print(f'Usuário "{user}" está autenticado.')

@@ -11,51 +11,47 @@ import sqlite3
     — The Zen of Python
 """
 
-
-db = "dbusers.scrypt.sqlite3"
+db = "db1.sqlite3"
 conn = sqlite3.connect(db)
 cc = conn.cursor()
-select_username = "SELECT * FROM users where username =?"
-insert_username = "INSERT INTO users VALUES (?, ?, ?)"
+select_username = "SELECT * FROM scrypt where username =?"
+insert_username = "INSERT INTO scrypt VALUES (?, ?, ?)"
 
-print(f'--- Criação das credencias de novo usuário ---')
-print(f'Digite um nome de usuario:')
+print('--- Criação das credencias de novo usuário ---\n\
+    Digite um nome de usuario:')
 username = input()
+
 if len(username) == 0:
-    print(f'Digite um nome de usuário.')
-    exit()
+    print('Digite um nome de usuário.')
 else:
     cc.execute(select_username, (username,))
-    data = cc.fetchone()
-    if data is not None:
-        print(f'Usuário já cadastrado.')
+    check_users = cc.fetchone()
+    if check_users is not None:
+        print('Usuário já cadastrado.')
         conn.close()
-        exit()
     else:
         pass
+
 print(f'Digite a senha para o usuário {username}\n'
       f' Use ao menos 2 dígitos e 2 caracteres em caixa alta.')
 password1 = input()
 
-nb = sum([1 for ch in password1 if ch.isdigit()])
-upp = sum([1 for ch in password1 if ch.isupper()])
+num_digits = sum([1 for ch in password1 if ch.isdigit()])
+num_upper = sum([1 for ch in password1 if ch.isupper()])
 
-if nb < 2 or upp < 2 or len(password1) < 10:
-    print(f'É preciso digitar uma senha igual ou maior que 10 caracteres'
-          f' e utilizando ao menos 2 dígitos e 2 caracteres em caixa alta.')
-    exit()
+if num_digits < 2 or num_upper < 2 or len(password1) < 10:
+    print('É preciso digitar uma senha igual ou maior que 10 caracteres\n\
+         e utilizando ao menos 2 dígitos e 2 caracteres em caixa alta.')
 else:
     print(f'Digite novamente a senha para o usuário {username}:')
     password2 = input()
     if len(password2) < 10:
-        print(f'É preciso digitar uma senha igual ou maior que 10 caracteres.')
-        exit()
-
+        print('É preciso digitar uma senha igual ou maior que 10 caracteres.')
     if password2 == password1:
-        hashedpwd = scrypt.hash(password1)
+        hashedpwd = scrypt.using(salt_size=64).hash(password1)
 
         try:
-            print('Conectando no banco de dados...')
+            print('Conectando ao banco de dados...')
             unixtime = int(time())
             cc.execute(insert_username, (username, hashedpwd, unixtime))
             conn.commit()

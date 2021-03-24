@@ -1,5 +1,5 @@
 from hashlib import pbkdf2_hmac
-from secrets import token_bytes
+from sys import exit as callexit
 import sqlite3
 
 """
@@ -11,47 +11,47 @@ import sqlite3
     — The Zen of Python
 """
 
-db = "dbusers.pbkdf2.sqlite3"
-select_username = "SELECT * FROM users where username =?"
+db = "db1.sqlite3"
+conn = sqlite3.connect(db)
+cc = conn.cursor()
+select_username = "SELECT * FROM pbkdf2 where username =?"
 
 try:
 
-    print(f'Autenticação de usuário.')
-    print(f'Digite um nome de usuário:')
+    print('Autenticação de usuário.\nDigite um nome de usuário:')
     user = input()
+    
     if len(user) == 0:
-        print(f'Erro: Digite um nome de usuário.')
-        exit()
+        print('Erro: Digite um nome de usuário.')
     else:
-        conn = sqlite3.connect(db)
-        cc = conn.cursor()
         cc.execute(select_username, (user,))
-        data = cc.fetchone()
-        if data is not None:
-            for _ in data:
+        check_users = cc.fetchone()
+        if check_users is not None:
+            for _ in check_users:
                 print(f'Digite a senha para o usuário {user}:')
                 password = input()
+                
                 if len(password) == 0:
-                    print(f'É preciso digitar uma senha. Inicie novamente.')
+                    print('É preciso digitar uma senha. Inicie novamente.')
                     conn.close()
-                    exit()
+                    callexit()
                 else:
-                    salt = data[1]
-                    hashed_db_password = data[2]
+                    salt = check_users[1]
+                    hashed_db_password = check_users[2]
                     checkpwd = pbkdf2_hmac('sha3_512', salt,
                                            password.encode('utf-8'), 25000)
-                    if checkpwd == hashed_db_password:
+                    
+                    if checkpwd:
                         print(f'Usuário "{user}" está autenticado.')
                         conn.close()
-                        exit()
+                        callexit()
                     else:
                         print(f'Senha inválida para o usuário "{user}".')
                         conn.close()
-                        exit()
+                        callexit()
         else:
             print(f'Usuário {user} não encontrado.')
             conn.close()
-            exit()
 
 except sqlite3.Error as erro:
     print(f'Erro: {erro}')

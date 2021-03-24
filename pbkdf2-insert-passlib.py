@@ -1,11 +1,10 @@
-from hashlib import pbkdf2_hmac
-from secrets import token_bytes
+from passlib.hash import pbkdf2_sha512
 from time import time
 import sqlite3
 
 """
     Cadastra o usuário especificado em uma base
-    sqlite3 utilizando pbkdf2.
+    sqlite3 utilizando pbkdf2 (passlib.hash module).
 
     PEP8 compliant
     “Beautiful is better than ugly.”
@@ -15,8 +14,8 @@ import sqlite3
 db = "db1.sqlite3"
 conn = sqlite3.connect(db)
 cc = conn.cursor()
-select_username = "SELECT * FROM pbkdf2 where username =?"
-insert_username = "INSERT INTO pbkdf2 VALUES (?, ?, ?, ?)"
+select_username = "SELECT * FROM pbkdf2passlib where username =?"
+insert_username = "INSERT INTO pbkdf2passlib VALUES (?, ?, ?)"
 
 print('--- Criação das credencias de novo usuário ---\n\
     Digite um nome de usuário:')
@@ -49,14 +48,12 @@ else:
     if len(password2) < 10:
         print('É preciso digitar uma senha igual ou maior que 10 caracteres.')
     if password2 == password1:
-        salt = token_bytes(64)
-        hashedpwd = pbkdf2_hmac('sha3_512', salt,
-                                password1.encode('utf-8'), 25000)
+        hashedpwd = pbkdf2_sha512.using(salt_size=64).hash(password1)
 
         try:
             print('Conectando ao banco de dados...')
             unixtime = int(time())
-            cc.execute(insert_username, (username, salt, hashedpwd, unixtime))
+            cc.execute(insert_username, (username, hashedpwd, unixtime))
             conn.commit()
             print(f'Usuário "{username}" cadastrado com sucesso.')
             conn.close()

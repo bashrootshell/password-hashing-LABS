@@ -40,8 +40,8 @@ num_digits = sum([1 for ch in password1 if ch.isdigit()])
 num_upper = sum([1 for ch in password1 if ch.isupper()])
 
 if num_digits < 2 or num_upper < 2 or len(password1) < 10:
-    print('É preciso digitar uma senha igual ou maior que 10 caracteres\n\
-         e utilizando ao menos 2 dígitos e 2 caracteres em caixa alta.')
+    print('É preciso digitar uma senha igual ou maior que 10 caracteres'
+          ' e utilizando ao menos 2 dígitos e 2 caracteres em caixa alta.')
 else:
     print(f'Digite novamente a senha para o usuário {username}:')
     password2 = input()

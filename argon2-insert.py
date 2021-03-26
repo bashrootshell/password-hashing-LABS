@@ -1,62 +1,59 @@
 from passlib.hash import argon2
 from time import time
-import sqlite3
+from sqlite3 import connect
 
 """
-    Cadastra o usuário especificado em uma base
-    sqlite3 utilizando argon2.
-
     PEP8 compliant
     “Beautiful is better than ugly.”
     — The Zen of Python
 """
 
 db = "db1.sqlite3"
-conn = sqlite3.connect(db)
+conn = connect(db)
 cc = conn.cursor()
-select_usuario = "SELECT * FROM argon2 where username =?"
-insert_usuario = "INSERT INTO argon2 VALUES (?, ?, ?)"
+select_username = "SELECT * FROM argon2 where username =?"
+insert_username = "INSERT INTO argon2 VALUES (?, ?, ?)"
 
-print('--- Criação das credencias de novo usuário ---\n\
-    Digite um nome de usuário:')
-usuario = input()
-if len(usuario) == 0:
-    print('Digite um nome de usuário.')
-else:
-    cc.execute(select_usuario, (usuario,))
-    check_users = cc.fetchone()
-    if check_users is not None:
+
+def check_if_username_exists():
+    global username
+    print('--- Credentials System ---\n\
+    Please type the user name:')
+    username = input()
+    assert username, 'Please type the user name.'
+    cc.execute(select_username, (username,))
+    assert cc.fetchone() is None, f'User {username} already in the database.'
+    return username
+
+
+def check_the_quality_of_the_password():
+    global password
+    print(f'Please type a password for {username}\n'
+          f' 10+ chars, with 2 digits and 2 uppercase letters.')
+    password = input()
+    num_digits = sum([1 for chars in password if chars.isdigit()])
+    num_upper = sum([1 for chars in password if chars.isupper()])
+    assert num_digits >= 2 and num_upper >= 2 and len(password) >= 10, (
+        'Please type a password with 10+ chars, with 2 digits'
+        ' and 2 uppercase letters.')
+    return password
+
+
+def insert_username_into_database():
+    try:
+
+        hashedpwd = argon2.using(salt_size=64).hash(password)
+        print('Connecting with the database...')
+        unixtime = int(time())
+        cc.execute(insert_username, (username, hashedpwd, unixtime))
+        conn.commit()
+        print(f'User {username} successfully inserted.')
         conn.close()
-        print('Usuário já cadastrado.')
 
-print(f'Digite a senha para o usuário {usuario}\n'
-      f' Use ao menos 2 dígitos e 2 caracteres em caixa alta.')
-pass_check_1 = input()
+    except conn.Error as error:
+        print(f'Error: {error}')
 
-num_digits = sum([1 for chars in pass_check_1 if chars.isdigit()])
-num_upper = sum([1 for chars in pass_check_1 if chars.isupper()])
 
-if num_digits < 2 or num_upper < 2 or len(pass_check_1) < 10:
-    print('É preciso digitar uma senha igual ou maior que 10 caracteres'
-          ' e utilizando ao menos 2 dígitos e 2 caracteres em caixa alta.')
-else:
-    print(f'Digite novamente a senha para o usuário {usuario}:')
-    pass_check_2 = input()
-    if len(pass_check_2) < 10:
-        print('É preciso digitar uma senha igual ou maior que 10 caracteres.')
-
-    if pass_check_2 == pass_check_1:
-        hashedpwd = argon2.using(salt_size=64).hash(pass_check_1)
-        try:
-            print('Conectando ao banco de dados...')
-            unixtime = int(time())
-            cc.execute(insert_usuario, (usuario, hashedpwd, unixtime))
-            conn.commit()
-            print(f'Usuário "{usuario}" cadastrado com sucesso.')
-            conn.close()
-
-        except sqlite3.Error as erro:
-            print(f'Erro: {erro}')
-
-    else:
-        print('Senhas não conferem. Tente novamente.')
+check_if_username_exists()
+check_the_quality_of_the_password()
+insert_username_into_database()

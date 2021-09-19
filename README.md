@@ -2,7 +2,7 @@
 
 ### This is a simple password hashing _PBKDF2 / SCRYPT / ARGON2 Python Implementation_ for educational purposes only, and it has been used by my computer science undergrad students.
 
-### Implemented using sqlite3, CouchDB and ElasticSearch
+### Implemented using sqlite3, CouchDB and ElasticSearch.
 
 
 It also executes a basic password strength test (not fancy at all, a pretty basic one).
